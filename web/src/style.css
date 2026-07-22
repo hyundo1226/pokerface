@@ -398,53 +398,13 @@ body {
   height: 100%;
   object-fit: cover;
 }
-.scan-guides {
+/* 화면 전체가 촬영 대상임을 알리는 단일 프레임 가이드 (칸 분리 없음) */
+.scan-frame-guide {
   position: absolute;
-  inset: 0;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 20px;
-}
-.guide {
-  flex: 1;
-  max-width: 70px;
-  aspect-ratio: 0.7;
-  border: 2px solid rgba(212, 175, 55, 0.7);
-  border-radius: 7px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(212, 175, 55, 0.06);
-}
-.guide.active {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
-}
-.guide-num {
-  position: absolute;
-  top: 3px;
-  left: 5px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-}
-.guide-card {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 17px;
-  background: var(--cream);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.guide-card.red {
-  color: var(--red);
-}
-.guide-card.blk {
-  color: var(--ink);
+  inset: 12px;
+  border: 2px dashed rgba(212, 175, 55, 0.65);
+  border-radius: 10px;
+  pointer-events: none;
 }
 .camera-status {
   display: none;
@@ -452,16 +412,64 @@ body {
   color: var(--gold-soft);
   text-align: center;
   padding: 0 6px;
+  line-height: 1.45;
 }
 .camera-status.visible {
   display: block;
 }
-.scan-picker-host {
+/* 인식 결과 슬롯 */
+.scan-slots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scan-slot {
   flex: 1;
+  min-width: 44px;
+  max-width: 72px;
+  aspect-ratio: 0.7;
+  background: var(--cream);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.scan-slot.red {
+  color: var(--red);
+}
+.scan-slot.blk {
+  color: var(--ink);
+}
+.scan-slot.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+}
+.scan-slot .slot-rank {
+  font-size: 18px;
+}
+.scan-slot .slot-suit {
+  font-size: 15px;
+}
+.scan-slot .slot-empty {
+  color: rgba(26, 20, 14, 0.35);
+  font-size: 18px;
+}
+.scan-picker-host {
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 10px;
   padding: 8px;
+  transition: max-height 0.2s ease;
+}
+.scan-picker-host.collapsed {
+  display: none;
 }
 .scan-bottom {
   display: flex;
