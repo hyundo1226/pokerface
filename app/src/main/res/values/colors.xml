@@ -1,0 +1,8 @@
+<resources>
+    <color name="poker_green">#0B6B3A</color>
+    <color name="poker_green_dark">#053D20</color>
+    <color name="poker_gold">#D4AF37</color>
+    <color name="poker_red">#C0392B</color>
+    <color name="poker_black">#1A1A1A</color>
+    <color name="poker_cream">#FAF6EC</color>
+</resources>
