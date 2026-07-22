@@ -1,6 +1,6 @@
 import { cardPickerGrid, h } from "../components";
 import { Card, isRedSuit, makeCard, rankLabel, SUIT_SYMBOL, Suit } from "../poker/card";
-import { recognizeCards } from "../ocr";
+import { OCR_CROP_FRACTION, recognizeCards } from "../ocr";
 import { activeBoardCards, AppState, store, streetInfo } from "../state";
 
 /**
@@ -29,14 +29,19 @@ export function renderScan(root: HTMLElement, state: AppState, kind: "hero" | "b
       kind === "hero" ? `내 카드 ${slotCount}장을 촬영하세요` : `보드 카드 ${slotCount}장을 촬영하세요`,
     ]),
     h("div", { class: "scan-sub" }, [
-      "카드를 부채꼴로 살짝 펼쳐 숫자 모서리가 보이게 한 뒤, 촬영 버튼을 누르세요",
+      "숫자 모서리가 노란 칸 안에 크게 들어오도록, 밝은 곳에서 촬영하세요",
     ]),
   ]);
 
   const video = h("video", { class: "scan-video", autoplay: true, playsinline: true, muted: true }) as HTMLVideoElement;
-  // 화면 전체가 촬영 대상임을 알리는 단일 프레임 가이드(칸 분리 없음).
+  // 실제 인식 영역(중앙 밴드)과 일치하는 단일 가이드 프레임. 이 안을 카드로 꽉 채우도록 유도한다.
   const frameGuide = h("div", { class: "scan-frame-guide" });
-  const videoWrap = h("div", { class: "scan-video-wrap" }, [video, frameGuide]);
+  frameGuide.style.left = `${OCR_CROP_FRACTION.x * 100}%`;
+  frameGuide.style.top = `${OCR_CROP_FRACTION.y * 100}%`;
+  frameGuide.style.width = `${OCR_CROP_FRACTION.w * 100}%`;
+  frameGuide.style.height = `${OCR_CROP_FRACTION.h * 100}%`;
+  const frameHint = h("div", { class: "scan-frame-hint" }, ["이 칸을 카드로 꽉 채우세요"]);
+  const videoWrap = h("div", { class: "scan-video-wrap" }, [video, frameGuide, frameHint]);
   const cameraStatus = h("div", { class: "camera-status" });
 
   // 인식된/선택된 카드 슬롯 (확인·수정용)
@@ -119,8 +124,8 @@ export function renderScan(root: HTMLElement, state: AppState, kind: "hero" | "b
   function captureFrame(): HTMLCanvasElement | null {
     if (!video.videoWidth || !video.videoHeight) return null;
     const canvas = document.createElement("canvas");
-    // 인식 정확도를 위해 과도하게 크지 않게 리사이즈(가로 최대 1280px).
-    const scale = Math.min(1, 1280 / video.videoWidth);
+    // 전처리(크롭·확대)가 뒤에서 이뤄지므로 여기서는 원본 해상도를 최대한 보존한다(과도한 크기만 제한).
+    const scale = Math.min(1, 1920 / video.videoWidth);
     canvas.width = Math.round(video.videoWidth * scale);
     canvas.height = Math.round(video.videoHeight * scale);
     const ctx = canvas.getContext("2d");

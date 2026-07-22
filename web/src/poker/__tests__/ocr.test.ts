@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractRankCandidates, isRedInkAt, normalizeRankToken, OcrWord } from "../../ocr";
+import { extractRankCandidates, isRedInkAt, normalizeRankToken, otsuThreshold, OcrWord } from "../../ocr";
 import { Rank } from "../card";
 
 const word = (text: string, x0: number, confidence = 90): OcrWord => ({
@@ -43,6 +43,22 @@ describe("extractRankCandidates", () => {
     const words = [word("A", 10, 90), word("K", 60, 10)];
     const result = extractRankCandidates(words, 5);
     expect(result.map((r) => r.rank)).toEqual([Rank.ACE]);
+  });
+});
+
+describe("otsuThreshold", () => {
+  it("separates a clean bimodal histogram between the two peaks", () => {
+    const hist = new Array(256).fill(0);
+    hist[50] = 1000; // 어두운 전경(글자)
+    hist[200] = 1000; // 밝은 배경(카드)
+    const t = otsuThreshold(hist, 2000);
+    // 임계값 이하는 전경(글자), 초과는 배경으로 갈려야 한다: [50, 200) 구간이면 올바른 분리.
+    expect(t).toBeGreaterThanOrEqual(50);
+    expect(t).toBeLessThan(200);
+  });
+
+  it("returns a safe default for an empty histogram", () => {
+    expect(otsuThreshold(new Array(256).fill(0), 0)).toBe(127);
   });
 });
 
